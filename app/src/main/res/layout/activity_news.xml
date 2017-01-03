@@ -10,7 +10,35 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.android.news.NewsActivity">
 
+    <LinearLayout
+        android:id="@+id/search_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <EditText
+            android:id="@+id/topic_field"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/search_hint"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+
+        <ImageView
+            android:id="@+id/search_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_search_black_36dp"
+            android:layout_gravity="center"/>
+
+
+
+    </LinearLayout>
+
+
     <ListView
+        android:layout_below="@id/search_field"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/list">
