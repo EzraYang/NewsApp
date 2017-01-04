@@ -22,13 +22,7 @@ import java.util.List;
 
 public class NewsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>> {
 
-    private String mFakeUrlString = "http://content.guardianapis.com/search?q=programmer&api-key=test";
-
-    private String mBaseUrlString = "http://content.guardianapis.com/search?api-key=test";
-
     private NewsAdapter mAdapter;
-
-    private ListView mListView;
 
     private EditText mTopicField;
 
@@ -45,7 +39,7 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
 
-        mListView = (ListView) findViewById(R.id.list);
+        ListView mListView = (ListView) findViewById(R.id.list);
         mAdapter = new NewsAdapter(NewsActivity.this, new ArrayList<News>());
         mListView.setAdapter(mAdapter);
 
@@ -70,37 +64,38 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // check if user has entered a new topic
+                // if so (and everything else works fine)
+                // init a new loader with loader id increment by 1
+                if (mTopicField.getText().toString() != mTopic){
+                    // clear up mAdapter leads to clear listView
+                    mAdapter.clear();
+                    // set mEmptyTextView an empty String
+                    // in case it was showing topic_needed or no_conn warning previously
+                    mEmptyTextView.setText("");
 
-//                if (mTopicField.getText().toString() != mTopic){
-//
-//
-//                }
-                // clear up mAdapter leads to clear listView
-                mAdapter.clear();
-                // set mEmptyTextView an empty String
-                // in case it was showing no_key_word or no_conn warning previously
-                mEmptyTextView.setText("");
+                    // check the internet connection on the device
+                    ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()){
+                        // check if user has enter a key word
+                        if (!mTopicField.getText().toString().isEmpty() ){
+                            // set mTopic to the current input
+                            mTopic = mTopicField.getText().toString();
 
-                // check the internet connection on the device
-                ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                if (networkInfo != null && networkInfo.isConnected()){
-                    // check if user has enter a key word
-                    if (!mTopicField.getText().toString().isEmpty() ){
+                            // since mTopic is different from the last one
+                            // have to get a new loader to load new data
+                            loaderId += 1;
+                            getLoaderManager().initLoader(loaderId, null, NewsActivity.this);
 
-                        mTopic = mTopicField.getText().toString();
-
-                        // if topic changes,
-                        // init a new loader with loaderId increment 1
-                        loaderId += 1;
-
-                        getLoaderManager().initLoader(loaderId, null, NewsActivity.this);
-
+                        } else {
+                            mEmptyTextView.setText(R.string.topic_needed);
+                        }
                     } else {
-                        mEmptyTextView.setText(R.string.new_topic_needed);
+                        mEmptyTextView.setText(R.string.no_conn);
                     }
                 } else {
-                    mEmptyTextView.setText(R.string.no_conn);
+                    // do nothing when current topic is the same as last topic
                 }
             }
         });
@@ -108,15 +103,12 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
-
-//        mTopic = mTopicField.getText().toString();
-
-
         progressDialog = new ProgressDialog(NewsActivity.this);
         progressDialog.setMessage("Loading...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();
 
+        String mBaseUrlString = "http://content.guardianapis.com/search?api-key=test";
         Uri baseUrl = Uri.parse(mBaseUrlString);
         Uri.Builder urlBuilder = baseUrl.buildUpon();
         urlBuilder.appendQueryParameter("q", mTopic);
@@ -128,7 +120,8 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<List<News>> loader) {
-
+        // Loader reset, so we can clear out our existing data.
+        mAdapter.clear();
     }
 
     @Override

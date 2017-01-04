@@ -9,7 +9,7 @@
 
     <string name="no_conn">No internet connection!</string>
     <string name="no_data">No data found!</string>
-    <string name="new_topic_needed">Please enter a new topic!</string>
+    <string name="topic_needed">Please enter a new topic!</string>
 
 
 </resources>
