@@ -1,6 +1,7 @@
 package com.example.android.news;
 
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -37,6 +38,8 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private TextView mEmptyTextView;
 
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +51,8 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mEmptyTextView = (TextView) findViewById(R.id.text_when_empty);
         mListView.setEmptyView(mEmptyTextView);
+
+        mTopicField = (EditText) findViewById(R.id.topic_field) ;
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -65,6 +70,11 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+//                if (mTopicField.getText().toString() != mTopic){
+//
+//
+//                }
                 // clear up mAdapter leads to clear listView
                 mAdapter.clear();
                 // set mEmptyTextView an empty String
@@ -75,17 +85,13 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
                 ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                 if (networkInfo != null && networkInfo.isConnected()){
-                    // find out what user's key search word
-                    mTopicField = (EditText) findViewById(R.id.topic_field) ;
-
                     // check if user has enter a key word
-                    if (!mTopicField.getText().toString().isEmpty() && mTopicField.getText().toString() != mTopic){
+                    if (!mTopicField.getText().toString().isEmpty() ){
 
                         mTopic = mTopicField.getText().toString();
 
                         // if topic changes,
                         // init a new loader with loaderId increment 1
-                        mAdapter.clear();
                         loaderId += 1;
 
                         getLoaderManager().initLoader(loaderId, null, NewsActivity.this);
@@ -103,7 +109,13 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
 
-        mTopic = mTopicField.getText().toString();
+//        mTopic = mTopicField.getText().toString();
+
+
+        progressDialog = new ProgressDialog(NewsActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
 
         Uri baseUrl = Uri.parse(mBaseUrlString);
         Uri.Builder urlBuilder = baseUrl.buildUpon();
@@ -122,9 +134,14 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<List<News>> loader, List<News> data) {
 
+        if(progressDialog.isShowing()){
+            progressDialog.dismiss();
+        }
 
         if ( data != null & !data.isEmpty()){
             mAdapter.addAll(data);
+        } else {
+            mEmptyTextView.setText(R.string.no_data);
         }
 
     }
