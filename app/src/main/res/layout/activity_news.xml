@@ -36,6 +36,16 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/text_when_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_field"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:textSize="20sp"
+        />
+
 
     <ListView
         android:layout_below="@id/search_field"

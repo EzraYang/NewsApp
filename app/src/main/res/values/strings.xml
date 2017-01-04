@@ -7,5 +7,9 @@
     <string name="search_title">Search title</string>
     <string name="search_hint">Enter a topic</string>
 
+    <string name="no_conn">No internet connection!</string>
+    <string name="no_data">No data found!</string>
+    <string name="new_topic_needed">Please enter a new topic!</string>
+
 
 </resources>
